@@ -106,5 +106,6 @@ const advanceAutoPartsScrapeParts = async ({
   }
 }
 
+// advanceAutoPartsScrapeParts({partName: 'BRAKE PADS', year: '2018', make: 'Ford', model: 'Focus', modelType:'SE', engineType:''}, '19001', true);
+
 module.exports.advanceAutoPartsScrapeParts = advanceAutoPartsScrapeParts;
-// getFordPartsByYearAndModel('BRAKE PADS', '2018', 'Ford', 'Focus', 'SE', '');

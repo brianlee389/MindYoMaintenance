@@ -150,6 +150,7 @@ const partsFordScrapeParts = async ({
 
       return productResults.map(mapPartsFordToStandardProductModel);
     } catch (error) {
+      console.log('Error happened in the parts.ford.com parser.');
       console.log(error);
     }
 }

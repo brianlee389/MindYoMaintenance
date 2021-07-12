@@ -41,6 +41,9 @@ const corsOptions = {
 }
 app.use(cors(corsOptions));
 
+app.get('/', (req, res) => {
+  res.json({message: 'Welcome to the parts api.'});
+})
 app.post('/fordparts', async (req, res) => {
   try {
     const {
@@ -57,6 +60,15 @@ app.post('/fordparts', async (req, res) => {
     const advanceAutoParts = advanceAutoPartsScrapeParts(req.body, zipcode, true);
 
     const responses = await Promise.allSettled([fordParts, advanceAutoParts]);
+    res.json({
+      sources: [{
+        source: 'Parts.Ford.com',
+        parts: responses[0].value
+      }, {
+        source: 'Advance Auto Parts',
+        parts: responses[1].value
+      }]
+    });
     res.json(responses);
   } catch (error) {
     console.log(error);
