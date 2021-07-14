@@ -16,15 +16,29 @@ const buildVehicleFilter = (year, make, model, engineType) => {
   return `year:"${year.toString()}" AND make:"${make}" AND model:"${model}"`;
 };
 
+
 const buildAdvanceAutoPartsQueryParameters = (partName, year, make, model, modelType, engineType) => {
-  const fullModelName = model + ' ' + modelType;
+  const getFullModelName = (model, modelType) => {
+    if (modelType) {
+      if (modelType.indexOf(model) > -1) {
+        return modelType;
+      } else {
+        return `${model} ${modelType}`
+      }
+    }
+
+    return model;
+  };
+
+  const vehicleFilter = buildVehicleFilter(year.toString(), make, getFullModelName(model, modelType));
+  console.log(vehicleFilter);
   return {
     q: partName,
     version: 'V2',
     // 'facet.multiselect=true'
     start: 0,
     rows: 1000,
-    vehicle_filter: buildVehicleFilter(year.toString(), make, fullModelName),
+    vehicle_filter: vehicleFilter,
     fields: 'PRICE,SALEPRICE,MFR,NAME,REVIEWCOUNT,REVIEWAVG,SKU,MFRPART,THUMBNAIL,SEOKEYWORD,isFitted,CORECHARGE,DESCR,SHIPPABLE,FDO,productType,PROMO_EXCLUSIONS',
     filter: 'isFitted_uFilter:1'
   };

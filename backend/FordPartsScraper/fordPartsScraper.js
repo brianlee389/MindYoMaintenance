@@ -33,11 +33,11 @@ const partsFordScrapeParts = async ({
     engine,
     partName
   }, zipcode, onlyInStock) => {
+    const browser = await playwright.chromium.launch({
+        headless: false, // setting this to true will not run the UI
+    });
+    const page = await browser.newPage();
     try {
-      const browser = await playwright.chromium.launch({
-          headless: false, // setting this to true will not run the UI
-      });
-      const page = await browser.newPage();
       const fordPartsHomePage = async () => {
         await page.goto('https://parts.ford.com/en.html');
 
@@ -105,31 +105,41 @@ const partsFordScrapeParts = async ({
         });
         await page.goto(`${resultsUrl}&pageSize=10000&pageNumber=1`, {
             waitUntil: 'load',
-            // Remove the timeout
             timeout: 0
         });
       };
 
       const parseProductListingPage = (partName) => {
+        const getRobustInnerText = (element) => {
+          if (element) {
+            return element.innerText;
+          }
+          return '';
+        };
         const productElements = Array.from(document.querySelectorAll('.partTile'));
         const products = productElements
           .filter((element) => {
-            return element.querySelector('.pName').innerText.toLowerCase() === partName.toLowerCase();
+            return getRobustInnerText(element.querySelector('.pName')).toLowerCase() === partName.toLowerCase();
           })
           .map((element) => {
             const productImgElement = element.querySelector('.partImageContainer');
-            const linkTag = productImgElement.querySelector('a');
-            const imgTag = productImgElement.querySelector('.fordThumbImg');
-            const priceString = element.querySelector('.yourPrice').innerText;
+            let linkTagHref = '';
+            let imgTagSrc = '';
+            if (productImgElement) {
+              linkTagHref = productImgElement.querySelector('a').href;
+              imgTagSrc = productImgElement.querySelector('.fordThumbImg').src;
+            }
+            const priceString = getRobustInnerText(element.querySelector('.yourPrice'));
             const indexOfDollarSign = priceString.indexOf('$')
+            const partNumber = getRobustInnerText(element.querySelector('.pNumber'));
 
             return {
-              name: element.querySelector('.pName').innerText,
-              description: element.querySelector('.partSectionName').innerText,
-              partNumber: element.querySelector('.pNumber').innerText,
-              cleanPartNumber: element.querySelector('.pNumber').innerText.substr(8),
-              imgUrl: imgTag.src,
-              productUrl: linkTag.href,
+              name: getRobustInnerText(element.querySelector('.pName')),
+              description: getRobustInnerText(element.querySelector('.partSectionName')),
+              partNumber: partNumber,
+              cleanPartNumber: partNumber.substr(8),
+              imgUrl: imgTagSrc,
+              productUrl: linkTagHref,
               price: Number(priceString.substr(indexOfDollarSign+1))
             }
           });
@@ -138,20 +148,22 @@ const partsFordScrapeParts = async ({
       };
 
       await fordPartsHomePage();
-      // await page.waitForNavigation({ waitUntil: 'networkidle0' });
+
       await page.waitForNavigation({ url: '**/shop/SearchDisplay**' });
 
       await navigateToAllProductListingPage();
 
       const productResults = await page.evaluate(parseProductListingPage, partName);
 
-      // await page.waitForTimeout(500000);
       await browser.close();
 
       return productResults.map(mapPartsFordToStandardProductModel);
     } catch (error) {
       console.log('Error happened in the parts.ford.com parser.');
       console.log(error);
+      if (browser) {
+        // browser.close();
+      }
     }
 }
 

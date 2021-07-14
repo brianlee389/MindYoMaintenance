@@ -3,8 +3,9 @@ var FormData = require('form-data');
 var {getAccessToken} = require('./fordAuthApi');
 
 const fordApiInformation = {
-  applicationId: 'afdc085b-377a-4351-b23e-5e1d35fb3700',
-  apiVersion: '2020-06-01'
+  'Application-Id': 'afdc085b-377a-4351-b23e-5e1d35fb3700',
+  'api-version': '2020-06-01',
+  'Content-Type': 'application/json',
 };
 
 const getVehicleList = async () => {
@@ -15,7 +16,6 @@ const getVehicleList = async () => {
     url: 'https://api.mps.ford.com/api/fordconnect/vehicles/v1',
     headers: {
       'Accept': 'application/json',
-      'Content-Type': 'application/json',
       'api-version': '2020-06-01',
       'Application-Id': 'afdc085b-377a-4351-b23e-5e1d35fb3700',
       'Authorization': `Bearer ${accessToken}`
@@ -61,6 +61,7 @@ const getVehicleInformationApi = async (vehicleId) => {
 
   return axios(config);
 };
+
 const retrieveCurrentVehicleData = async () => {
   const vehicleListResponse = await getVehicleList();
   const { vehicles } = vehicleListResponse.data;
@@ -83,6 +84,7 @@ const retrieveCurrentVehicleData = async () => {
     const vehicleInformationResponse = await getVehicleInformationApi(vehicleId);
 
     console.log(JSON.stringify(vehicleInformationResponse.data));
+    return vehicleInformationResponse.data;
   }
 };
 
