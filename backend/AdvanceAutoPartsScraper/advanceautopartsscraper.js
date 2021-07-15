@@ -10,12 +10,12 @@ const advanceautopartsSearchUrl = 'https://shop.advanceautoparts.com/sch/search'
 // })
 
 const buildVehicleFilter = (year, make, model, engineType) => {
-  if (!!engineType && engineType.length > 0) {
-      return `year:"${year.toString()}" AND make:"${make}" AND model:"${model}" AND engine:"${engineType}"`;
-  }
-  return `year:"${year.toString()}" AND make:"${make}" AND model:"${model}"`;
+  // if (!!engineType && engineType.length > 0) {
+  //     return `year:"${year.toString()}" AND make:"${make}" AND model:"${model}" AND engine:"${engineType}"`;
+  // }
+  const cleanModelName = model.toLowerCase().replace('4wd', '').replace('2wd', '').replace('awd', '').trim()
+  return `year:"${year.toString()}" AND make:"${make}" AND model:"${cleanModelName}"`;
 };
-
 
 const buildAdvanceAutoPartsQueryParameters = (partName, year, make, model, modelType, engineType) => {
   const getFullModelName = (model, modelType) => {

@@ -5,6 +5,8 @@ const cors = require("cors");
 const bodyParser = require('body-parser');
 const {vehicleTypeRouter} = require('./routes/vehicleTypeRouter');
 const {partsScraperRouter} = require('./routes/partsScraperRouter');
+const fs = require('fs');
+const https = require('https');
 
 const { getEngineTypes, getModelTypes } = require('./AutozoneScraper/autozoneVehicleModelRetriever');
 
@@ -53,14 +55,14 @@ app.use('/parts', partsScraperRouter);
 
 app.get('/', async (req, res) => {
   try {
-    const key = 'key';
+    const key = 'code';
     const cacheValue = await req.redisClient.getAsync(key);
     if (cacheValue && (cacheValue.length > 2)) {
       res.json({message: cacheValue, cachehit: true});
     } else {
-      await req.redisClient.setAsync(key, 'stringvalue');
-      await req.redisClient.expireAsync(key, 15);
-      res.json({message: 'stringvalue', cachehit: false});
+      await req.redisClient.setAsync(key, req.query.code);
+      await req.redisClient.expireAsync(key, 60*20);
+      res.json({message: 'savedtoken', cachehit: false});
     }
   } catch (error) {
     console.log(error);

@@ -28,6 +28,7 @@ router.post('/fordparts', async (req, res, next) => {
       zipcode
     } = req.body
     if (!year || !make || !model || !partName || !zipcode) {
+      // console.log(JSON.stringify(req.body));
       res.json({
         message: 'Request body has invalid parameters.',
         sources: []

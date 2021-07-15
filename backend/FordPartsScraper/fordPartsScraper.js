@@ -162,8 +162,9 @@ const partsFordScrapeParts = async ({
       console.log('Error happened in the parts.ford.com parser.');
       console.log(error);
       if (browser) {
-        // browser.close();
+        browser.close();
       }
+      return [];
     }
 }
 
