@@ -1,14 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import {NavigationContainer, Theme} from '@react-navigation/native';
 import {StatusBar} from 'expo-status-bar';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {Provider as PaperProvider, Appbar} from 'react-native-paper';
+import {Provider as PaperProvider, Appbar, Title} from 'react-native-paper';
 import {useColorScheme} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { Provider as StoreProvider, useSelector } from 'react-redux';
-
 import {combineThemes} from './theme';
 import MenuIcon from './components/MenuIcon';
 import MenuContent from './components/MenuContent';
@@ -17,18 +16,22 @@ import VehicleInformation from './Screens/VehicleInformation';
 import AvailableParts from './Screens/AvailableParts';
 import MaintenanceList from './Screens/MaintenanceList';
 import Authenticate from './Screens/Authenticate';
+/*import MaintenanceScheduleScreen from './Screens/MaintenanceScheduleScreen';*/
 import store from './src/redux/store';
+import base from './styles/base';
+import { createStackNavigator } from '@react-navigation/stack';
+import AppHeaderBar from './components/AppHeaderBar';
 
 export default function App() {
   const colorScheme = useColorScheme() as 'light' | 'dark';
   const theme = combineThemes(colorScheme);
-
   const Tab = createMaterialBottomTabNavigator();
 
   return (
     <StoreProvider store={store}>
       <SafeAreaProvider>
         <PaperProvider theme={theme as ReactNativePaper.Theme}>
+          <AppHeaderBar />
           <NavigationContainer theme={theme as Theme}>
             <Tab.Navigator>
               <Tab.Screen

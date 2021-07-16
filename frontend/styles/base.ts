@@ -22,5 +22,11 @@ export default StyleSheet.create({
   viewFlexCenter: {
     justifyContent: 'flex-start',
     alignItems: 'center'
+  },
+  blackText: {
+    color: '#000000'
+  },
+  marginTop20: {
+    marginTop: 20
   }
 });

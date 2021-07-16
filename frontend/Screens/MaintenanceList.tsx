@@ -1,6 +1,6 @@
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import React, {useCallback, useEffect, useState, Fragment} from 'react';
-import {View, Text} from 'react-native';
+import {ScrollView, Text, Alert} from 'react-native';
 import {Divider, FAB, List, Portal, Title, Colors} from 'react-native-paper';
 import ActionBar from '../components/ActionBar';
 import { useSelector, useDispatch } from 'react-redux';
@@ -16,7 +16,13 @@ const MaintenanceList: React.FunctionComponent<IMaintenanceListProps> = (props) 
   const dispatch = useDispatch();
   const isScreenFocused = useIsFocused();
   const navigation = useNavigation();
-  const blackText = { color: '#000000'};
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    if (isFocused) {
+      dispatch(createDispatchObject('CHANGE_PAGE', 'Authentication'));
+    }
+  }, [isFocused]);
 
   const partsList = [
     'Brake Pad',
@@ -26,7 +32,6 @@ const MaintenanceList: React.FunctionComponent<IMaintenanceListProps> = (props) 
     'Air Filter',
     'Cabin Air Filter',
     'Serpentine Belt',
-    'Battery',
     'Coolant'
   ];
 
@@ -41,19 +46,23 @@ const MaintenanceList: React.FunctionComponent<IMaintenanceListProps> = (props) 
     'Serpentine Belt': 'steering',
     'Coolant': 'car-coolant-level'
   };
-  const partsListComponent = partsList.map((partName, index) => {
-    const partIsCurrentlyNeeded = notificationsState.filter((part) => {
-      return part.toLowerCase() === partName.toLowerCase();
+
+  const isPartCurrentlyNeeded = (partname) => {
+      return notificationsState.filter((notificationType) => {
+      return notificationType.toLowerCase() === partname.toLowerCase();
     }).length > 0;
-    const rightIcon = (props) => {
-      if (partIsCurrentlyNeeded) {
-        return <List.Icon {...props} color={Colors.red500} icon={'exclamation'} />
+  };
+  const partsListComponent = partsList.map((partName, index) => {
+    const isNeeded = isPartCurrentlyNeeded(partName);
+    const leftIcon = (props) => {
+      if (!isNeeded) {
+        return <List.Icon {...props} color={Colors.green500} icon={'check'} />
       }
-      return null;
+      return <List.Icon {...props} color={Colors.red500} icon={partMappingToIcons[partName]} />;
     };
     const backgroundColorStyleObject = (props) => {
-      if (partIsCurrentlyNeeded) {
-        return {backgroundColor: '#FFD23F'}
+      if (isNeeded) {
+        return {backgroundColor: '#C8E0F4'}
       }
       return {};
     };
@@ -62,27 +71,31 @@ const MaintenanceList: React.FunctionComponent<IMaintenanceListProps> = (props) 
       <List.Item
         title={partName}
         description=''
-        left={(props) => <List.Icon {...props} color={Colors.blue500} icon={partMappingToIcons[partName]} />}
-        right={(props) => rightIcon(props) }
-        style={{...blackText, width: '100%', borderBottom: '1px solid #E0E0E2', ...backgroundColorStyleObject()}}
-        titleStyle={blackText}
-        descriptionStyle={blackText}
+        left={(props) => leftIcon(props)}
+        style={{...base.blackText, width: '100%', borderBottom: '1px solid #16324F', ...backgroundColorStyleObject()}}
+        titleStyle={base.blackText}
+        descriptionStyle={base.blackText}
         onPress={() => {
-          dispatch(createDispatchObject('SELECT_APP_PART_NAME', partName));
-          dispatch(createDispatchObject('CHANGE_PAGE', 'Available Parts'));
+          /*if (confirm('Would you like to view available replacement parts?')) {*/
+            dispatch(createDispatchObject('SELECT_APP_PART_NAME', partName));
+            dispatch(createDispatchObject('CHANGE_PAGE', 'Available Parts'));
 
-          navigation.navigate('AvailableParts');
+            navigation.navigate('AvailableParts');
+          /*}*/
         }}
-        onLongPress={() => console.log('mark as completed')}
+        onLongPress={() => {
+          if (isNeeded ) {
+            dispatch(createDispatchObject('REMOVE_NOTIFICATION_TYPE', partName));
+          }
+        }}
       />
     </Fragment>);
   });
 
   return (
-    <View style={{...base.viewFlexCenter}}>
-      <Title style={base.pageTitle}>Maintenance Items</Title>
+    <ScrollView contentContainerStyle={{...base.viewFlexCenter}}>
       {partsListComponent}
-    </View>
+    </ScrollView>
   );
 };
 

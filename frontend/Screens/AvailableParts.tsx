@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View, Image, StyleSheet,Text} from 'react-native';
+import {ScrollView, View, Image, StyleSheet,Text, Button} from 'react-native';
 import {Title, List, Divider, ActivityIndicator, Colors} from 'react-native-paper';
 import SourcePartsList from '../components/SourcePartsList';
 import base from '../styles/base';
@@ -16,6 +16,7 @@ const AvailableParts: React.FunctionComponent<IAvailablePartsProps> = ({navigati
   const vehicleState = useSelector(state => state.vehicleState);
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
+  const [clickedShowResults, setClickedShowResults] = useState(-1);
   const [isLoading, setIsLoading] = useState(true);
 
   const blackText = { color: '#000000' };
@@ -35,11 +36,10 @@ const AvailableParts: React.FunctionComponent<IAvailablePartsProps> = ({navigati
       const response = await getParts(requestBody);
 
       if (response && response.data && response.data.sources) {
-        console.log(JSON.stringify(response.data));
         dispatch(createDispatchObject('PULL_PRODUCTS', response.data.sources));
         dispatch(createDispatchObject('SELECT_PART_NAME', appState.partName.toLowerCase()));
       } else {
-        console.log('error message');
+        dispatch(createDispatchObject('PULL_PRODUCTS', []));
       }
       setIsLoading(false);
     } catch (error) {
@@ -49,56 +49,22 @@ const AvailableParts: React.FunctionComponent<IAvailablePartsProps> = ({navigati
   };
 
   useEffect(() => {
-    dispatch(createDispatchObject('CHANGE_PAGE', 'Available Parts'));
-
-  }, []);
-  useEffect(() => {
-    /*alert(appState.partName.toLowerCase() + ' | ' +productsState.partName.toLowerCase());*/
-     /*&& appState.partName.toLowerCase() !== productsState.partName.toLowerCase()*/
-    if(isFocused && appState.partName !== '') {
+    if (isFocused) {
+      dispatch(createDispatchObject('CHANGE_PAGE', 'Available Parts'));
+    }
+    if(isFocused && (appState.partName !== '')) {
+      setIsLoading(true);
       retrieveParts();
     } else {
       setIsLoading(false);
     }
-
-    /*setPartsSources([
-      {
-        source: 'ford',
-        parts: [
-          {
-              "name": "Engine Oil",
-              "description": "Ford Motorcraft OIL3051",
-              "partNumber": "XO5W205Q3SP (5W20)",
-              "mfrPART": "XO5W205Q3SP (5W20)",
-              "SKU": "",
-              "uniqueId": "XO5W205Q3SP (5W20)",
-              "price": 29.32,
-              "salePrice": 29.32,
-              "imgUrl": "https://parts.ford.com/images/photo-images/761/341761.jpg",
-              "productUrl": "https://parts.ford.com/shop/en/us/fluids-chemicals-and-lubricants/motor-oils/oil-engine-7870401-1"
-          },
-          {
-              "name": "Engine Oil",
-              "description": "Ford Motorcraft OIL3051",
-              "partNumber": "XO5W305Q3SP (5W30)",
-              "mfrPART": "XO5W305Q3SP (5W30)",
-              "SKU": "",
-              "uniqueId": "XO5W305Q3SP (5W30)",
-              "price": 29.32,
-              "salePrice": 29.32,
-              "imgUrl": "https://parts.ford.com/images/photo-images/980/368980.jpg",
-              "productUrl": "https://parts.ford.com/shop/en/us/fluids-chemicals-and-lubricants/motor-oils/oil-engine-7852581-1"
-          }
-        ]
-      }]);*/
-  }, [isFocused]);
-
+  }, [isFocused, clickedShowResults]);
 
   const listOfSourceParts = () => {
     const partsSources = Array.from(productsState.partsSources);
 
     if (partsSources.length === 0) {
-      return <Text style={blackText}>You must select a part from the Maintenance Page.</Text>
+      return <Text style={blackText}>Click this button to see the results: <Button onPress={()=> {setClickedShowResults(-1*clickedShowResults)}}>Show Results</Button></Text>
     } else {
       return partsSources.map(({source, parts}, index) =>
         <SourcePartsList
@@ -108,27 +74,15 @@ const AvailableParts: React.FunctionComponent<IAvailablePartsProps> = ({navigati
         />
       );
     }
-  }
-  const pageTitle: string = productsState.partsSources.length === 0 ? 'Available Parts' : `Available Parts for ${appState.partName}`;
+  };
+  const pageTitle: string = productsState.partsSources.length === 0 ? 'Search Results' : `Search Results for ${appState.partName}`;
 
   return (
-    <View style={base.viewFlexCenter}>
-      <Title style={base.pageTitle}>{pageTitle}</Title>
-      <Divider style={base.dividerTitle} />
-      <ActivityIndicator animating={isLoading} color={Colors.red800} size={'large'} />
-      {listOfSourceParts()}
-    </View>
+    <ScrollView contentContainerStyle={base.viewFlexCenter}>
+      <Title style={blackText}>{pageTitle}</Title>
+      {isLoading ? <ActivityIndicator animating={isLoading} color={Colors.blue800} size={'large'} /> : listOfSourceParts()}
+    </ScrollView>
   );
 };
 
 export default AvailableParts;
-/*
-<List.Item
-  title={'Go Back'}
-  description=''
-  left={(props) => <List.Icon {...props} icon='arrow-left' />}
-  style={{width: '100%'}}
-  onPress={() => {
-    navigation.goBack()
-  }}
-/>*/

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import qs from 'qs';
+const apiHostName = 'https://mindyomaintenance.loca.lt';
 
 export const getParts = async ({
   year,
@@ -21,8 +22,10 @@ export const getParts = async ({
   });
   const config = {
     method: 'post',
-    url: 'http://localhost:3000/parts/fordparts',
+    url: `${apiHostName}/parts/fordparts`,
     headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Bypass-Tunnel-Reminder': 'anything',
       'Content-Type': 'application/x-www-form-urlencoded'
     },
     data : body

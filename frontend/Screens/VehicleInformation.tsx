@@ -1,12 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import {View} from 'react-native';
+import {View, ScrollView, Image} from 'react-native';
 import {Title, Text, Avatar, RadioButton, Button, Divider, Subheading} from 'react-native-paper';
 import base from '../styles/base';
-import { Link } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 import {combineDarkTheme} from '../theme';
 import createDispatchObject from '../src/createDispatchObject';
 import { getEngineTypes, getAvailableModelTypes } from '../Services/VehicleTypeApi';
+import { getVehicleImageThumbnailBlobUrl } from '../Services/FordApi';
 import {
   DarkTheme as PaperDarkTheme,
   DefaultTheme as PaperDefaultTheme,
@@ -19,6 +19,8 @@ const VehicleInformation: React.FunctionComponent<IVehicleInformation> = ({navig
   const appState = useSelector(state => state.appState);
   const productsState = useSelector(state => state.productsState);
   const vehicleState = useSelector(state => state.vehicleState);
+  const authState = useSelector(state => state.authState);
+
   const dispatch = useDispatch();
   const blackText = {color: '#000000'};
   const isFocused = useIsFocused();
@@ -27,9 +29,22 @@ const VehicleInformation: React.FunctionComponent<IVehicleInformation> = ({navig
 
   const [selectedModelTypeIndex, setSelectedModelTypeIndex] = useState(-1);
   const [selectedEngineTypeIndex, setSelectedEngineTypeIndex] = useState(-1);
+  const [blobUrl, setBlobUrl] = useState('');
 
   useEffect(() => {
     if (isFocused) {
+      const loadBlobUrl = async () => {
+        try {
+          const loadedBlobUrl = await getVehicleImageThumbnailBlobUrl(authState.vehicleId, vehicleState.year, vehicleState.make, vehicleState.model, authState.access_token);
+          setBlobUrl(loadedBlobUrl);
+        } catch (error) {
+          console.log(error);
+          setBlobUrl(require('../assets/missingimage.png'));
+        }
+      }
+
+      loadBlobUrl();
+
       dispatch(createDispatchObject('CHANGE_PAGE', 'Vehicle Information'));
       const retrieveModelTypes = async () => {
         try {
@@ -52,6 +67,7 @@ const VehicleInformation: React.FunctionComponent<IVehicleInformation> = ({navig
         }
       };
       retrieveModelTypes();
+
     }
   }, [isFocused]);
 
@@ -83,38 +99,18 @@ const VehicleInformation: React.FunctionComponent<IVehicleInformation> = ({navig
   }, [selectedModelTypeIndex]);
 
   const modelTypeRadioButtons = Array.from(modelTypes).map(({model, modelId}, index) => {
-    return <Text style={blackText} key={index}>
-      <RadioButton
-        value={model}
-        status={index === selectedModelTypeIndex ? 'checked' : 'unchecked' }
-        onPress={() => {
-          setSelectedModelTypeIndex(index);
-          /*dispatch(createDispatchObject());*/
-        }}
-        color={'#468189'}
-        uncheckedColor={'#13293d'}
-        theme={combineDarkTheme()}
-      />
-      {model}
-    </Text>
+    return <RadioButton.Item key={index} label={model} value={index} />;
   });
+  const modelTypeRadioGroup = (<RadioButton.Group style={{width: '100%'}} onValueChange={value => setSelectedModelTypeIndex(value)} value={selectedModelTypeIndex}>
+      {modelTypeRadioButtons}
+    </RadioButton.Group>);
 
   const engineRadioButtons = engineTypes.map(({engine, engineId}, index) => {
-    return <Text style={blackText} key={index}>
-      <RadioButton
-        value={engine}
-        status={index === selectedEngineTypeIndex ? 'checked' : 'unchecked' }
-        onPress={() => {
-          setSelectedEngineTypeIndex(index);
-          /*dispatch(createDispatchObject());*/
-        }}
-        color={'#468189'}
-        uncheckedColor={'#13293d'}
-        theme={combineDarkTheme()}
-      />
-      {engine}
-    </Text>
+    return <RadioButton.Item key={index} label={engine} value={index} />;
   });
+  const engineTypeRadioGroup = (<RadioButton.Group style={{width: '100%'}} onValueChange={value => setSelectedEngineTypeIndex(value)} value={selectedEngineTypeIndex}>
+      {engineRadioButtons}
+  </RadioButton.Group>);
 
   const saveVehicleInformation = () => {
     if (selectedModelTypeIndex > -1) {
@@ -128,38 +124,33 @@ const VehicleInformation: React.FunctionComponent<IVehicleInformation> = ({navig
   };
 
   return (
-    <View style={{justifyContent: 'flex-start', alignItems: 'center'}}>
-      <Title style={base.pageTitle}>Vehicle Information</Title>
-      <Divider style={base.dividerTitle} />
+    <ScrollView contentContainerStyle={{justifyContent: 'flex-start', alignItems: 'center', padding: 5}}>
         <Avatar.Image
-          size={100}
-          source={'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%3Fid%3DOIP.EuEmHWYMdp2F5w3Rwq4QxQHaEG%26pid%3DApi&f=1'}
-          style={{marginBottom: '12px'}}
+          size={175}
+          source={{uri: blobUrl}}
+          style={{marginBottom: 12, maxWidth: 175, maxHeight: 175, backgroundColor: 'transparent'}}
         />
-      <View style={{justifyContent: 'flex-start', alignItems: 'left'}}>
-        <Subheading style={blackText}><b>Year</b></Subheading>
+        <Subheading style={{...blackText, fontWeight: 'bold'}}>Year</Subheading>
         <Text style={blackText}>{vehicleState.year || ''}</Text>
-        <Subheading style={blackText}><b>Make</b></Subheading>
+        <Subheading style={{...blackText, fontWeight: 'bold'}}>Make</Subheading>
         <Text style={blackText}>{vehicleState.make || ''}</Text>
-        <Subheading style={blackText}><b>Model</b></Subheading>
+        <Subheading style={{...blackText, fontWeight: 'bold'}}>Model</Subheading>
         <Text style={blackText}>{vehicleState.model || ''}</Text>
-        <Subheading style={blackText}><b>Submodel(or Model Type):</b></Subheading>
+        <Subheading style={{...blackText, fontWeight: 'bold'}}>Submodel(or Model Type):</Subheading>
         <Text style={blackText}>{vehicleState.modelType || 'None Selected'}</Text>
-        {modelTypeRadioButtons}
-        <Subheading style={blackText}><b>Engine</b></Subheading>
+        <Subheading style={{...blackText, fontWeight: 'bold'}}>Select a submodel:</Subheading>
+        {modelTypeRadioGroup}
+        <Subheading style={{...blackText, fontWeight: 'bold'}}>Engine</Subheading>
         <Text style={blackText}>{vehicleState.engineType || 'None Selected'}</Text>
-        {engineRadioButtons}
-        <Subheading style={blackText}><b>Odometer</b></Subheading>
-        <Text style={blackText}>{vehicleState.miles} miles</Text>
-        <Button mode="contained" onPress={() => saveVehicleInformation() }>
+        <Subheading style={{...blackText, fontWeight: 'bold'}}>Select an engine:</Subheading>
+        {engineTypeRadioGroup}
+        <Subheading style={{...blackText, fontWeight: 'bold'}}>Odometer</Subheading>
+        <Text style={blackText}>{vehicleState.odometer} miles</Text>
+        <Button mode="contained" style={{width:'100%'}} onPress={() => saveVehicleInformation() }>
           Save
         </Button>
-        <Link
-          to='/MaintenanceList'>
-        View your Maintenance Schedule
-        </Link>
-      </View>
-    </View>
+
+    </ScrollView>
 
   );
 };

@@ -65,7 +65,7 @@ export function combineThemes(
   };
 
 
-  return CombinedDarkTheme;
+  return combineDarkTheme();
   // return themeType === 'dark' ? CombinedDarkTheme : CombinedDefaultTheme;
 }
 

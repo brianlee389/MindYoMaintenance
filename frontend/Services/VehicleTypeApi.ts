@@ -1,10 +1,14 @@
 import axios from 'axios';
+const apiHostName = 'https://mindyomaintenance.loca.lt';
 
 export const getAvailableModelTypes = async (year, make, model) => {
   const config = {
     method: 'get',
-    url: 'http://localhost:3000/vehicle/getAvailableModelTypes',
-    headers: { },
+    url: `${apiHostName}/vehicle/getAvailableModelTypes`,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Bypass-Tunnel-Reminder': 'anything'
+    },
     params: {
       year: year,
       make: make,
@@ -28,9 +32,11 @@ export const selectModelType = async (selectedIndex) => {
   });
   const config = {
     method: 'post',
-    url: 'http://localhost:3000/vehicle/selectModelType',
+    url: `${apiHostName}/vehicle/selectModelType`,
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Access-Control-Allow-Origin': '*',
+      'Bypass-Tunnel-Reminder': 'anything'
     },
     data : queryParams
   };
@@ -48,8 +54,11 @@ export const selectModelType = async (selectedIndex) => {
 export const getEngineTypes = async (modelId) => {
   const config = {
     method: 'get',
-    url: 'http://localhost:3000/vehicle/getEngineTypes',
-    headers: { },
+    url: `${apiHostName}/vehicle/getEngineTypes`,
+    headers: {
+      'Bypass-Tunnel-Reminder': 'anything',
+      'Access-Control-Allow-Origin': '*'
+    },
     params: {
       modelId: modelId
     }
