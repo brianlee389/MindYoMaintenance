@@ -2,18 +2,11 @@ const axios = require('axios');
 
 const advanceautopartsSearchUrl = 'https://shop.advanceautoparts.com/sch/search';
 
-// const inventoryApiUrl = 'https://shop.advanceautoparts.com/ag/inventory?skus=11112656,15750160,14340169,12072935,10235836,10152148,10146217,14340355,12496094,12484822&locations=6604';
-// axios.get(inventoryApiUrl)
-// .then(function (response) {
-//   // handle success
-//   console.log(JSON.stringify(response.data));
-// })
-
 const buildVehicleFilter = (year, make, model, engineType) => {
   // if (!!engineType && engineType.length > 0) {
   //     return `year:"${year.toString()}" AND make:"${make}" AND model:"${model}" AND engine:"${engineType}"`;
   // }
-  const cleanModelName = model.toLowerCase().replace('4wd', '').replace('2wd', '').replace('awd', '').trim()
+  const cleanModelName = model.replace('4WD', '').replace('2WD', '').replace('AWD', '').trim()
   return `year:"${year.toString()}" AND make:"${make}" AND model:"${cleanModelName}"`;
 };
 
@@ -67,7 +60,12 @@ const isAvailableInStore = ({FDO}) => {
 }
 
 const mapAdvanceAutoPartsToStandardProductModel = (product) => {
-  const thumbnailUrl = `https://shop.advanceautoparts.com/wcsstore/CVWEB/staticproductimage/${product.THUMBNAIL}`;
+  const buildThumbnailUrl = () => {
+    if (!product.THUMBNAIL || product.THUMBNAIL === undefined) {
+      return 'https://shop.advanceautoparts.com/wcsstore/CVB2BDirectStorefrontAssetStore/responsive/images/noImage_426x426.png';
+    }
+    return `https://shop.advanceautoparts.com/wcsstore/CVWEB/staticproductimage/${product['THUMBNAIL']}`;
+  };
   const productUrl = `https://shop.advanceautoparts.com/p/${product.SEOKEYWORD}/${product.SKU}-P`;
 
   return {
@@ -79,7 +77,7 @@ const mapAdvanceAutoPartsToStandardProductModel = (product) => {
     uniqueId: product.uniqueId,
     price: product.PRICE,
     salePrice: product.SALEPRICE,
-    imgUrl: thumbnailUrl,
+    imgUrl: buildThumbnailUrl(),
     productUrl: productUrl
   };
 };

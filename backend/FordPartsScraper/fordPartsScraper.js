@@ -119,7 +119,7 @@ const partsFordScrapeParts = async ({
         const productElements = Array.from(document.querySelectorAll('.partTile'));
         const products = productElements
           .filter((element) => {
-            return getRobustInnerText(element.querySelector('.pName')).toLowerCase() === partName.toLowerCase();
+            return getRobustInnerText(element.querySelector('.pName')).toLowerCase() === partName.toLowerCase() || getRobustInnerText(element.querySelector('.pName')).toLowerCase().indexOf(partName.toLowerCase()) > -1;
           })
           .map((element) => {
             const productImgElement = element.querySelector('.partImageContainer');

@@ -35,17 +35,20 @@ app.use((req, res, next) => {
     getAsync: getAsync,
     expireAsync: expireAsync
   };
+  res.header('Access-Control-Allow-Origin', '*');
+  // req.db = db;
   next();
 });
 
 const whitelist = ['http://localhost:3000', 'http://localhost:3001']
 const corsOptions = {
   origin: function (origin, callback) {
-    if (true) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
+    // if (true) {
+    //   callback(null, true);
+    // } else {
+    //   callback(new Error('Not allowed by CORS'));
+    // }
+    callback(null, true);
   }
 }
 app.use(cors(corsOptions));
@@ -55,6 +58,7 @@ app.use('/parts', partsScraperRouter);
 
 app.get('/', async (req, res) => {
   try {
+    //IGNORE this is a test api endpoint
     const key = 'code';
     const cacheValue = await req.redisClient.getAsync(key);
     if (cacheValue && (cacheValue.length > 2)) {
@@ -64,6 +68,7 @@ app.get('/', async (req, res) => {
       await req.redisClient.expireAsync(key, 60*20);
       res.json({message: 'savedtoken', cachehit: false});
     }
+
   } catch (error) {
     console.log(error);
     res.json({message: 'error'});

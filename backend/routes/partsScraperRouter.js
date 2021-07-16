@@ -39,7 +39,7 @@ router.post('/fordparts', async (req, res, next) => {
     const partsCacheValue = await req.redisClient.getAsync(cacheKey);
     const jsonParsedCache = JSON.parse(partsCacheValue);
     if (partsCacheValue && jsonParsedCache && (partsCacheValue.length > 2)) {
-      await req.redisClient.expireAsync(cacheKey, 600);
+      await req.redisClient.expireAsync(cacheKey, 120);
       console.log('Cache hit partsScraperRouter');
       res.json(jsonParsedCache);
     } else {
@@ -53,7 +53,7 @@ router.post('/fordparts', async (req, res, next) => {
           source: 'Parts.Ford.com',
           parts: responses[0].value || []
         }, {
-          source: 'Advance Auto Parts',
+          source: 'AdvanceAutoParts',
           parts: responses[1].value || []
         }]
       };
