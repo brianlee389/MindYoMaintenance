@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView, View, Image, StyleSheet,Text, Button} from 'react-native';
-import {Title, List, Divider, ActivityIndicator, Colors} from 'react-native-paper';
+import {ScrollView, View, Image, StyleSheet,Text} from 'react-native';
+import {Title, List, Divider, ActivityIndicator, Colors, Button} from 'react-native-paper';
 import SourcePartsList from '../components/SourcePartsList';
 import base from '../styles/base';
 import { useSelector, useDispatch } from 'react-redux';
@@ -64,7 +64,11 @@ const AvailableParts: React.FunctionComponent<IAvailablePartsProps> = ({navigati
     const partsSources = Array.from(productsState.partsSources);
 
     if (partsSources.length === 0) {
-      return <Text style={blackText}>Click this button to see the results: <Button onPress={()=> {setClickedShowResults(-1*clickedShowResults)}}>Show Results</Button></Text>
+      return (<React.Fragment>
+        <Text style={{...blackText, marginTop:10, marginBottom: 10}}>There were no results from the search attempt.</Text>
+        <Text style={{...blackText, marginTop:10, marginBottom: 20}}>Click this button to see the results:</Text>
+        <Button mode='contained' onPress={()=> {setClickedShowResults(-1*clickedShowResults)}}>Show Results</Button>
+      </React.Fragment>);
     } else {
       return partsSources.map(({source, parts}, index) =>
         <SourcePartsList

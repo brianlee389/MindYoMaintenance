@@ -58,7 +58,7 @@ router.post('/fordparts', async (req, res, next) => {
         }]
       };
       await req.redisClient.setAsync(cacheKey, JSON.stringify(partResponse));
-      await req.redisClient.expireAsync(cacheKey, 600);
+      await req.redisClient.expireAsync(cacheKey, 60*300);
       console.log('Cache miss partsScraperRouter');
       res.json(partResponse);
     }

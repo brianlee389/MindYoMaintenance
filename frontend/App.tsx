@@ -38,7 +38,7 @@ export default function App() {
                 name="Authenticate"
                 component={Authenticate}
                 options={{
-                  tabBarLabel: 'Authentication',
+                  tabBarLabel: 'Auth',
                   tabBarIcon: ({ color }) => (
                     <MaterialCommunityIcons name="key-outline" color={color} size={26} />
                   ),

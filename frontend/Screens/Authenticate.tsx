@@ -103,8 +103,12 @@ const Authenticate: React.FunctionComponent<IAuthenticateProps> = (props) => {
 
   useEffect(() => {
     const initializeFordDetails = async () => {
-      await setAuthState();
-      setIsLoading(false);
+      try {
+        await setAuthState();
+        setIsLoading(false);
+      } catch (error) {
+        setIsLoading(false);
+      }
     }
     initializeFordDetails();
   }, [authState.code]);
@@ -133,11 +137,11 @@ const Authenticate: React.FunctionComponent<IAuthenticateProps> = (props) => {
   }
   return (
     <View style={{...base.viewFlexCenter, padding: 10}}>
-      <Subheading style={base.blackText}>You will need to link your Ford account and then retrieve the code in the results url:</Subheading>
+      <Subheading style={base.blackText}>You will need to link your Ford Connect Account to MindYoMaintenance by retrieving the authorization code.</Subheading>
       <Button
           mode="contained"
           onPress={() => Linking.openURL(fordAccountLinkUrl)}
-      >Click Here to Open the Linking Url</Button>
+      >Click Here to Open Ford Connect Login Page</Button>
       <Subheading style={{color: '#000000', ...base.marginTop20}}>Authorization Code</Subheading>
       <Divider style={{width: '100%'}} />
       <TextInput

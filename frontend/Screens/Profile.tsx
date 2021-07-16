@@ -28,19 +28,19 @@ const Profile: React.FunctionComponent<IProfileProps> = (props) => {
     return vehicleAccountName;
   }
 
-  const getMileage = () => {
+  /*const getMileage = () => {
     if (vehicleState.odometer > vehicleState.dynamicOdometer) {
       return vehicleState.odometer;
     } else {
       return vehicleState.dynamicOdometer;
     }
-  }
+  }*/
   const updateVehicleMaintenanceNotifications = () => {
     const difference = vehicleState.dynamicOdometer - vehicleState.odometer;
-    if (difference < 10000) {
+    if (difference < 9500) {
       dispatch(createDispatchObject('REMOVE_ALL_NOTIFICATIONS'));
     }
-    if (difference >= 10000) {
+    if (difference >= 9500) {
       [
         'Engine Oil',
         'Engine Oil Filter',
@@ -51,7 +51,7 @@ const Profile: React.FunctionComponent<IProfileProps> = (props) => {
         dispatch(createDispatchObject('ADD_NOTIFICATION_TYPE', part));
       });
     }
-    if (difference > 35000) {
+    if (difference > 34500) {
       [
         'Brake Pad',
         'Brake Rotor'
@@ -59,16 +59,17 @@ const Profile: React.FunctionComponent<IProfileProps> = (props) => {
         dispatch(createDispatchObject('ADD_NOTIFICATION_TYPE', part));
       });
     }
-    if (difference > 50000) {
+    if (difference > 49500) {
       dispatch(createDispatchObject('ADD_NOTIFICATION_TYPE', 'Serpentine Belt'));
     }
-    if (new Date().getFullYear() - Number.parseInt(vehicleState.year) >= 4) {
+
+    /*if (new Date().getFullYear() - Number.parseInt(vehicleState.year) >= 4) {
       dispatch(createDispatchObject('ADD_NOTIFICATION_TYPE', 'Battery'));
-    }
+    }*/
   };
 
   const [visible, setVisible] = React.useState(false);
-  const [mileage, setMileage] = React.useState(getMileage());
+  const [mileage, setMileage] = React.useState(0);
   const [dynamicOdometer, setDynamicOdometer] = React.useState(0);
 
   useEffect(() => {
