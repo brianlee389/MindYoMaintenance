@@ -37,8 +37,21 @@ npm run startserver
 
 The backend should be running after that on localhost:3000 which proxies into https://mindyomaintenance.loca.lt.
 
+## WARNING!
+- If localtunnel is not running the path https://mindyomaintenance.loca.lt then switch to the branch "localhost-3000" in this repository
+- If this is the case, you only need to run
+```
+docker-compose up
+```
+then
+```
+npm run startserver
+```
+on your local machine.
+
 ## Frontend Installation
-Navigate back to the main directory
+Install the backend before you start doing the installation process for the frontend.
+Navigate back to the main directory.
 Then run:
 ```
 cd frontend
