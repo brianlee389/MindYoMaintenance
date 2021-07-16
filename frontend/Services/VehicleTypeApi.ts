@@ -2,28 +2,28 @@ import axios from 'axios';
 const apiHostName = 'https://mindyomaintenance.loca.lt';
 
 export const getAvailableModelTypes = async (year, make, model) => {
-  const config = {
-    method: 'get',
-    url: `${apiHostName}/vehicle/getAvailableModelTypes`,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Bypass-Tunnel-Reminder': 'anything'
-    },
-    params: {
-      year: year,
-      make: make,
-      model: model
-    }
-  };
+  try {
+    const config = {
+      method: 'get',
+      url: `${apiHostName}/vehicle/getAvailableModelTypes`,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Bypass-Tunnel-Reminder': 'anything'
+      },
+      params: {
+        year: year,
+        make: make,
+        model: model
+      }
+    };
 
-  const { data } = await axios(config);
-  return data;
-    // .then(function (response) {
-    //   console.log(JSON.stringify(response.data));
-    // })
-    // .catch(function (error) {
-    //   console.log(error);
-    // });
+    const { data } = await axios(config);
+    return data;
+  } catch (error) {
+    console.log('Error calling getAvailableModelTypes.');
+    console.log(error);
+    return [];
+  };
 };
 
 export const selectModelType = async (selectedIndex) => {
@@ -52,33 +52,33 @@ export const selectModelType = async (selectedIndex) => {
 }
 
 export const getEngineTypes = async (modelId) => {
-  const config = {
-    method: 'get',
-    url: `${apiHostName}/vehicle/getEngineTypes`,
-    headers: {
-      'Bypass-Tunnel-Reminder': 'anything',
-      'Access-Control-Allow-Origin': '*'
-    },
-    params: {
-      modelId: modelId
-    }
-  };
+  try {
+    const config = {
+      method: 'get',
+      url: `${apiHostName}/vehicle/getEngineTypes`,
+      headers: {
+        'Bypass-Tunnel-Reminder': 'anything',
+        'Access-Control-Allow-Origin': '*'
+      },
+      params: {
+        modelId: modelId
+      }
+    };
 
-  // {
-  //   "engineTypes": [
-  //     {
-  //         "engine": "4 Cylinders H 2.3L FI Turbo DOHC 140 CID",
-  //         "count": "0",
-  //         "engineId": "36524701"
-  //     }
-  //   ]
-  // }
-  const { data } = await axios(config);
-  return data;
-    // .then(function (response) {
-    //   console.log(JSON.stringify(response.data));
-    // })
-    // .catch(function (error) {
-    //   console.log(error);
-    // });
+    // {
+    //   "engineTypes": [
+    //     {
+    //         "engine": "4 Cylinders H 2.3L FI Turbo DOHC 140 CID",
+    //         "count": "0",
+    //         "engineId": "36524701"
+    //     }
+    //   ]
+    // }
+    const { data } = await axios(config);
+    return data;
+  } catch (error) {
+    console.log('Error running getEngineTypes');
+    console.log(error);
+    return {engineTypes: []};
+  }
 }

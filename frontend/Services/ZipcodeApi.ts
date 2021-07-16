@@ -1,16 +1,4 @@
 import axios from 'axios';
-//
-// const getLatLngFromZipcode = async (zipcode) => {
-//   var config = {
-//     method: 'get',
-//     url: `https://api.promaptools.com/service/us/zip-lat-lng/get/?key=17o8dysaCDrgv1c&zip=${zipcode}`,
-//     headers: {
-//       'Accept': 'application/json, text/javascript, */*; q=0.01',
-//     }
-//   };
-//
-//   return axios(config);
-// }
 
 export const getZipcodeFromLatLong = async (lat, lng) => {
   const config = {

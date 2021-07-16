@@ -23,7 +23,6 @@
     "playwright": "^1.12.3"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "startserver": "node server.js",
     "localtunnel": "lt --port 3000 --subdomain mindyomaintenance"
   },
